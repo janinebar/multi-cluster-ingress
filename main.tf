@@ -29,6 +29,13 @@ resource "google_project_service" "enable-services" {
   disable_on_destroy = false
 }
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Create VPC
+# ----------------------------------------------------------------------------------------------------------------------
+# resource "google_compute_network" "default-vpc" {
+#     name = "default1"                   
+#     auto_create_subnetworks = true
+# }
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Configure GKE
@@ -37,6 +44,10 @@ module "gke" {
   source  = "./modules/gke"
 
   project_id = var.project_id
+
+#   depends_on = [
+#       google_compute_network.default-vpc
+#   ]
 #   project = var.project_id
 #   regions = var.regions
 #   gke_service_account_roles = var.gke_service_account_roles
@@ -128,9 +139,10 @@ module "mcs" {
 module "gateway" {
     source = "./modules/gateway"
     project_id = var.project_id
+    providers = {
+        kubectl = kubernetes.gke-west
+    }
     depends_on = [
-        module.gke,
-        module.fleet,
         module.mcs,
   ]
 }
@@ -152,11 +164,4 @@ module "mci" {
         module.mcs,
         module.gateway
     ]
-}
-
-# ----------------------------------------------------------------------------------------------------------------------
-# Deploy store app
-# ----------------------------------------------------------------------------------------------------------------------
-module "store-app" {
-    source = "./modules/store-app"
 }

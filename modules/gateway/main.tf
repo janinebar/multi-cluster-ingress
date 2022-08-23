@@ -8,12 +8,16 @@
 #   }
 # }
 
-resource "null_resource" "command-gke-west-credential" {
-  provisioner "local-exec" {
-    command = format("gcloud container clusters get-credentials gke-west-1a --zone=us-west1-a --project=%s", var.project_id)
-  }
-}
+# resource "null_resource" "command-gke-west-credential" {
+#   provisioner "local-exec" {
+#     command = format("gcloud container clusters get-credentials gke-west-1a --zone=us-west1-a --project=%s", var.project_id)
+#   }
+# }
 
+# data "google_container_cluster" "gke_west" {
+#     name = "gke-west-1a"
+#     location = "us-west1-a"
+# }
 
 terraform {
   required_providers {
@@ -23,13 +27,6 @@ terraform {
     }
   }
 }
-
-# provider "kubectl" {
-#     host                   = "https://${data.google_container_cluster.gke_west.endpoint}"
-#     cluster_ca_certificate = base64decode("${data.google_container_cluster.gke_cluster_0.master_auth.0.cluster_ca_certificate}")
-#     token                  = data.google_client_config.current.access_token
-#     alias = "gke-west"
-# }
 
 # Apply gateway CRD for main cluster
 # data "kubectl_path_documents" "docs" {
@@ -56,21 +53,24 @@ terraform {
 ## WORKING 
 resource "kubectl_manifest" "gateway-classes" {
     yaml_body = file("${path.module}/manifests/gateway.networking.k8s.io_gatewayclasses.yaml")
-    depends_on = [
-        null_resource.command-gke-west-credential
-    ]
+    provider = kubectl
+    # depends_on = [
+    #     null_resource.command-gke-west-credential
+    # ]
 }
 
 resource "kubectl_manifest" "gateways" {
     yaml_body = file("${path.module}/manifests/gateway.networking.k8s.io_gateways.yaml")
-    depends_on = [
-        null_resource.command-gke-west-credential
-    ]
+    provider = kubectl
+    # depends_on = [
+    #     null_resource.command-gke-west-credential
+    # ]
 }
 
 resource "kubectl_manifest" "http-routes" {
     yaml_body = file("${path.module}/manifests/gateway.networking.k8s.io_httproutes.yaml")
-    depends_on = [
-        null_resource.command-gke-west-credential
-    ]
+    provider = kubectl
+    # depends_on = [
+    #     null_resource.command-gke-west-credential
+    # ]
 }
