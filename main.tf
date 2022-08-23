@@ -32,10 +32,13 @@ resource "google_project_service" "enable-services" {
 # ----------------------------------------------------------------------------------------------------------------------
 # Create VPC
 # ----------------------------------------------------------------------------------------------------------------------
-# resource "google_compute_network" "default-vpc" {
-#     name = "default1"                   
-#     auto_create_subnetworks = true
-# }
+resource "google_compute_network" "default-vpc" {
+    name = "default"                   
+    auto_create_subnetworks = true
+    depends_on = [
+        google_project_service.enable-services
+    ]
+}
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Configure GKE
@@ -45,40 +48,12 @@ module "gke" {
 
   project_id = var.project_id
 
-#   depends_on = [
-#       google_compute_network.default-vpc
-#   ]
-#   project = var.project_id
-#   regions = var.regions
-#   gke_service_account_roles = var.gke_service_account_roles
-#   gke-node-count = var.gke-node-count
-#   gke-node-type = var.gke-node-type
+  depends_on = [
+      google_compute_network.default-vpc,
+      google_project_service.enable-services
+  ]
   
 }
-
-# ----------------------------------------------------------------------------------------------------------------------
-# Configure Workload Identity # already enabled ?
-# ----------------------------------------------------------------------------------------------------------------------
-# module "workload-identity" {
-# #   source = "./modules/workload-identity"
-#   source    = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
-#   name      = "demo"
-#   namespace = "default"
-#   project   = var.project_id
-
-
-#   project_id = var.project_id
-#   ksa_name = var.ksa_name
-#   iam_ksa = var.iam_ksa
-#   namespace = var.k8-namespace
-
-#   depends_on = [
-#     module.gke
-#   ]
-#}
-
-
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Configure Fleet Membership
@@ -92,14 +67,7 @@ module "fleet" {
   gke-cluster-name = each.value.name
   gke-cluster-id = each.value.id
 
-  
-#   vpc-name = var.vpc-name
-#   project-number = data.google_project.project.number
-#   gke-sa = module.gke.gke-sa
-
-#   enable-mci = false
   enable-mcs = true
-#   enable-acm = false
 
   depends_on = [
     module.gke
@@ -107,25 +75,14 @@ module "fleet" {
 }  
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Configure MCS 
+# Configure Multi-Cluster Services 
 # ----------------------------------------------------------------------------------------------------------------------
 module "mcs" {
   source = "./modules/mcs"
 
   project_id = var.project_id
-#   for_each = {for idx,val in module.gke.cluster_list: idx => val}
 
-#   gke-cluster-name = each.value.name
-#   gke-cluster-id = each.value.id
-
-  
-#   vpc-name = var.vpc-name
-#   project-number = data.google_project.project.number
-#   gke-sa = module.gke.gke-sa
-
-#   enable-mci = false
   enable-mcs = true
-#   enable-acm = false
 
   depends_on = [
     module.gke,
@@ -140,7 +97,7 @@ module "gateway" {
     source = "./modules/gateway"
     project_id = var.project_id
     providers = {
-        kubectl = kubernetes.gke-west
+        kubectl = "kubectl.gke-west"
     }
     depends_on = [
         module.mcs,
@@ -148,12 +105,11 @@ module "gateway" {
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Configure MCI
+# Configure Multi-Cluster Ingress
 # ----------------------------------------------------------------------------------------------------------------------
 module "mci" {
     source = "./modules/mci"
 
-    # fleet-membership = google_gke_hub_membership.membership
     project_id = var.project_id
     project_number = var.project_number
     gke-cluster-name = "gke-west-1a"

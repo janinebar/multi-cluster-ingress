@@ -25,8 +25,6 @@ resource "google_container_cluster" "gke-west-1" {
             oauth_scopes = [
                 "https://www.googleapis.com/auth/cloud-platform"
             ]
-
-            # service_account = google_service_account.default.email
         }
     }
     
@@ -34,13 +32,13 @@ resource "google_container_cluster" "gke-west-1" {
         create = "30m"
         update = "40m"
     }
-
-    provisioner "local-exec" {
-        command = format("kubectl config rename-context gke_%s_%s_%s %s",var.project_id,self.location,self.name,self.name)
-    }
     provisioner "local-exec" {
         command = format("gcloud container clusters get-credentials gke-west-1a --zone=us-west1-a --project=%s", var.project_id)
     }
+    provisioner "local-exec" {
+        command = format("kubectl config rename-context gke_%s_%s_%s %s",var.project_id,self.location,self.name,self.name)
+    }
+
 }
 
 resource "google_container_cluster" "gke-east-1" {
@@ -64,7 +62,6 @@ resource "google_container_cluster" "gke-east-1" {
             oauth_scopes = [
                 "https://www.googleapis.com/auth/cloud-platform"
             ]
-            # service_account = google_service_account.default.email
         }
     }
     timeouts {
@@ -72,6 +69,10 @@ resource "google_container_cluster" "gke-east-1" {
         update = "40m"
     }
     provisioner "local-exec" {
+        command = format("gcloud container clusters get-credentials gke-east-1 --zone=us-east1-b --project=%s", var.project_id)
+    }
+    provisioner "local-exec" {
         command = format("kubectl config rename-context gke_%s_%s_%s %s",var.project_id,self.location,self.name,self.name)
     }
+    
 }

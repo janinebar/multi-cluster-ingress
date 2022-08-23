@@ -9,9 +9,6 @@ variable "project_id" {
 variable "project_number" {
     type = string
 }
-# variable "fleet-membership" {}
-
-# variable "project"{}
 
 variable "vpc-name" {
     type = string
@@ -51,27 +48,13 @@ variable "services_to_enable" {
     type    = list(string)
     default =  [
         "compute.googleapis.com",
-        "iap.googleapis.com",
-        "anthos.googleapis.com",
-        "anthosaudit.googleapis.com",
-        "anthosgke.googleapis.com",
-        "cloudresourcemanager.googleapis.com",
         "container.googleapis.com",
         "gkeconnect.googleapis.com",
         "gkehub.googleapis.com",
         "iam.googleapis.com",
-        "logging.googleapis.com",
-        "monitoring.googleapis.com",
         "multiclusterservicediscovery.googleapis.com",
         "multiclusteringress.googleapis.com",
-        "opsconfigmonitoring.googleapis.com",
-        "serviceusage.googleapis.com",
-        "stackdriver.googleapis.com",
-        "servicemanagement.googleapis.com",
-        "servicecontrol.googleapis.com",
-        "storage.googleapis.com",
         "trafficdirector.googleapis.com",
-        "run.googleapis.com"
     ]
 }
 
@@ -94,37 +77,4 @@ variable "gke_service_account_roles" {
         "container.admin",
         "source.reader"
     ]
-}
-
-# GKE Settings
-variable "gke-node-count" {
-    description = "GKE Inital Node Count"
-    type = number
-    default = 3
-}
-
-variable "gke-node-type" {
-    description = "GKE Node Machine Shape"
-    type = string
-    default = "e2-standard-4"
-}
-
-# Deployment Info
-variable "k8-namespace" {
-    description = "Default name space to provision into"
-    type = string
-    default = "hipster"
-}
-
-# GKE Application Service account
-variable "ksa_name" {
-    description = "Kubernetes Service Account Name"
-    type = string
-    default = "hipster-ksa"
-}
-
-variable "iam_ksa" {
-    description = "IAM user for KSA"
-    type = string
-    default = "hipster-gsa"
 }

@@ -7,7 +7,7 @@ resource "google_gke_hub_feature" "mcs" {
 
     count = var.enable-mcs == true ? 1 : 0
 
-    # project  = var.project_id
+    project  = var.project_id
     provider = google-beta
     name = "multiclusterservicediscovery"
     location = "global"
@@ -17,7 +17,7 @@ resource "google_gke_hub_feature" "mcs" {
 resource "google_project_iam_member" "mcs_service_account-roles" {
 
     count = var.enable-mcs == true ? 1 : 0
-    project = "janine-mcs"
+    project = var.project_id
     
     role    = "roles/compute.networkViewer"
     member  = "serviceAccount:${var.project_id}.svc.id.goog[gke-mcs/gke-mcs-importer]"
