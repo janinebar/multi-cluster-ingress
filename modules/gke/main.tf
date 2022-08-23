@@ -3,7 +3,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 resource "google_container_cluster" "gke-west-1" {
     provider  = google-beta
-    name     = "gke-west-1a"
+    name     = "gke-west-1"
     location = "us-west1-a"
 
     release_channel {
@@ -33,7 +33,7 @@ resource "google_container_cluster" "gke-west-1" {
         update = "40m"
     }
     provisioner "local-exec" {
-        command = format("gcloud container clusters get-credentials gke-west-1a --zone=us-west1-a --project=%s", var.project_id)
+        command = format("gcloud container clusters get-credentials gke-west-1 --zone=us-west1-a --project=%s", var.project_id)
     }
     provisioner "local-exec" {
         command = format("kubectl config rename-context gke_%s_%s_%s %s",var.project_id,self.location,self.name,self.name)

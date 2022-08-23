@@ -32,13 +32,14 @@ resource "google_project_service" "enable-services" {
 # ----------------------------------------------------------------------------------------------------------------------
 # Create VPC
 # ----------------------------------------------------------------------------------------------------------------------
-resource "google_compute_network" "default-vpc" {
-    name = "default"                   
-    auto_create_subnetworks = true
-    depends_on = [
-        google_project_service.enable-services
-    ]
-}
+# resource "google_compute_network" "default-vpc" {
+#     name = "default"                   
+#     auto_create_subnetworks = true
+#     project = var.project_id
+#     depends_on = [
+#         google_project_service.enable-services
+#     ]
+# }
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Configure GKE
@@ -49,7 +50,7 @@ module "gke" {
   project_id = var.project_id
 
   depends_on = [
-      google_compute_network.default-vpc,
+    #   google_compute_network.default-vpc,
       google_project_service.enable-services
   ]
   
@@ -112,7 +113,7 @@ module "mci" {
 
     project_id = var.project_id
     project_number = var.project_number
-    gke-cluster-name = "gke-west-1a"
+    gke-cluster-name = "gke-west-1"
 
     depends_on = [
         module.gke,
