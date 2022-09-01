@@ -1,3 +1,7 @@
+# ----------------------------------------------------------------------------------------------------------------------
+# Configure Gateway
+# ----------------------------------------------------------------------------------------------------------------------
+
 terraform {
   required_providers {
     kubectl = {
@@ -7,8 +11,7 @@ terraform {
   }
 }
 
-
-## WORKING 
+# Apply manifests
 resource "kubectl_manifest" "gateway-classes" {
     yaml_body = file("${path.module}/manifests/gateway.networking.k8s.io_gatewayclasses.yaml")
     provider = kubectl

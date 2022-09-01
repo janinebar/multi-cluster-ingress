@@ -4,6 +4,4 @@
 variable "project_id" {}
 variable "gke-cluster-name" {}
 variable "gke-cluster-id" {}
-variable "enable-mcs" {
-    # default = false
-}
+variable "enable-mcs" {}

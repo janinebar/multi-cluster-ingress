@@ -1,3 +1,6 @@
+# ----------------------------------------------------------------------------------------------------------------------
+# "gke-west-1" GKE Cluster Data/Resources
+# ----------------------------------------------------------------------------------------------------------------------
 data "google_container_cluster" "gke_west" {
     name = module.gke.cluster_list[0].name
     location = module.gke.cluster_list[0].location
@@ -13,9 +16,11 @@ provider "kubectl" {
     alias = "gke-west"
 }
 
-# Apply manifests
 
-# west cluster
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Apply Manifests
+# ----------------------------------------------------------------------------------------------------------------------
 resource "kubectl_manifest" "store-west-ns" {
     yaml_body = file("./manifests/store.yaml")
     provider = kubectl.gke-west
